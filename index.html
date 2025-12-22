@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Fulus - Обмен валют</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -25,6 +25,7 @@
             --card-border: rgba(212, 165, 116, 0.3);
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; }
         body {
             font-family: 'Montserrat', sans-serif;
             background: var(--bg-gradient);
@@ -40,77 +41,92 @@
             pointer-events: none;
             z-index: 0;
         }
-        .container { position: relative; z-index: 1; max-width: 100%; padding: 0 16px 100px; }
-        .header { text-align: center; padding: 24px 0 20px; }
+        .container { position: relative; z-index: 1; max-width: 100%; padding: 0 16px 80px; }
+        .header { text-align: center; padding: 24px 0 16px; }
         .logo { font-family: 'Amiri', serif; font-size: 42px; font-weight: 700; color: var(--sand); text-shadow: 0 2px 20px rgba(212, 165, 116, 0.4); letter-spacing: 4px; }
-        .logo-arabic { font-family: 'Amiri', serif; font-size: 18px; color: var(--gold-light); opacity: 0.8; letter-spacing: 8px; }
+        .logo-arabic { font-family: 'Amiri', serif; font-size: 22px; color: var(--gold-light); opacity: 0.9; margin-top: 4px; direction: rtl; }
         .subtitle { font-size: 11px; text-transform: uppercase; letter-spacing: 3px; color: var(--blue-light); margin-top: 8px; font-weight: 500; }
-        .decorative-line { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 16px 0 24px; }
+        .decorative-line { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 12px 0 20px; }
         .decorative-line::before, .decorative-line::after { content: ''; width: 60px; height: 1px; background: linear-gradient(90deg, transparent, var(--sand), transparent); }
         .decorative-diamond { width: 8px; height: 8px; background: var(--gold); transform: rotate(45deg); }
-        .section-title { font-family: 'Amiri', serif; font-size: 22px; color: var(--sand); margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+        .section-title { font-family: 'Amiri', serif; font-size: 20px; color: var(--sand); margin-bottom: 14px; display: flex; align-items: center; gap: 10px; }
         .section-title::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--sand-dark), transparent); }
-        .city-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 24px; }
-        .city-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 16px 12px; text-align: center; cursor: pointer; transition: all 0.3s ease; backdrop-filter: blur(10px); position: relative; overflow: hidden; }
+        
+        /* City Emoji */
+        .city-emoji {
+            font-size: 40px;
+            margin-bottom: 8px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+        }
+        
+        .city-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
+        .city-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 14px 10px; text-align: center; cursor: pointer; transition: all 0.3s ease; backdrop-filter: blur(10px); position: relative; overflow: hidden; }
         .city-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--sand), var(--gold), var(--sand)); opacity: 0; transition: opacity 0.3s ease; }
         .city-card:hover, .city-card.active { background: rgba(212, 165, 116, 0.15); border-color: var(--sand); transform: translateY(-2px); }
         .city-card.active::before { opacity: 1; }
-        .city-icon { font-size: 28px; margin-bottom: 8px; }
+        .city-card.active .city-photo { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201, 162, 39, 0.3); }
         .city-name { font-weight: 600; font-size: 14px; margin-bottom: 2px; }
-        .city-currency { font-size: 11px; color: var(--sand-light); opacity: 0.7; }
-        .rates-container { display: none; margin-bottom: 24px; }
+        .city-currency { font-size: 11px; color: var(--sand-light); opacity: 0.7; display: flex; align-items: center; justify-content: center; gap: 4px; }
+        
+        .rates-container { display: none; margin-bottom: 20px; }
         .rates-container.visible { display: block; animation: fadeIn 0.4s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .rate-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 20px; margin-bottom: 12px; backdrop-filter: blur(10px); }
-        .rate-pair { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 16px; }
-        .currency-badge { background: linear-gradient(135deg, var(--blue-royal), var(--blue-accent)); padding: 8px 16px; border-radius: 12px; font-weight: 600; font-size: 15px; border: 1px solid rgba(212, 165, 116, 0.2); }
-        .rate-arrow { color: var(--gold); font-size: 20px; }
-        .rate-values { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .rate-item { text-align: center; padding: 12px; background: rgba(0, 0, 0, 0.2); border-radius: 12px; }
-        .rate-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--sand-light); opacity: 0.7; margin-bottom: 6px; }
-        .rate-value { font-size: 22px; font-weight: 700; color: var(--sand); }
-        .rate-currency { font-size: 12px; color: var(--blue-light); margin-top: 2px; }
+        .rate-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 16px; margin-bottom: 10px; backdrop-filter: blur(10px); }
+        .rate-pair { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 12px; }
+        .currency-badge { background: linear-gradient(135deg, var(--blue-royal), var(--blue-accent)); padding: 6px 12px; border-radius: 10px; font-weight: 600; font-size: 13px; border: 1px solid rgba(212, 165, 116, 0.2); display: flex; align-items: center; gap: 6px; }
+        .currency-icon { font-size: 14px; }
+        .rate-arrow { color: var(--gold); font-size: 18px; }
+        .rate-values { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .rate-item { text-align: center; padding: 10px; background: rgba(0, 0, 0, 0.2); border-radius: 10px; }
+        .rate-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--sand-light); opacity: 0.7; margin-bottom: 4px; }
+        .rate-value { font-size: 20px; font-weight: 700; color: var(--sand); }
+        .rate-currency { font-size: 11px; color: var(--blue-light); margin-top: 2px; }
+        
         .exchange-section { display: none; }
         .exchange-section.visible { display: block; animation: fadeIn 0.4s ease; }
-        .tabs { display: flex; background: var(--card-bg); border-radius: 16px; padding: 4px; margin-bottom: 20px; border: 1px solid var(--card-border); }
-        .tab { flex: 1; padding: 14px; text-align: center; border-radius: 12px; cursor: pointer; font-weight: 600; font-size: 14px; transition: all 0.3s ease; color: var(--text-light); opacity: 0.6; }
+        .tabs { display: flex; background: var(--card-bg); border-radius: 14px; padding: 4px; margin-bottom: 16px; border: 1px solid var(--card-border); }
+        .tab { flex: 1; padding: 12px; text-align: center; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 13px; transition: all 0.3s ease; color: var(--text-light); opacity: 0.6; }
         .tab.active { background: linear-gradient(135deg, var(--sand-dark), var(--gold)); color: var(--blue-deep); opacity: 1; box-shadow: 0 4px 15px rgba(212, 165, 116, 0.3); }
-        .form-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 24px 20px; backdrop-filter: blur(10px); }
-        .pair-selector { margin-bottom: 20px; }
-        .pair-selector label, .input-group label { display: block; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: var(--sand-light); margin-bottom: 8px; }
-        .pair-selector select, .input-group input { width: 100%; padding: 14px 16px; background: rgba(0, 0, 0, 0.3); border: 1px solid var(--card-border); border-radius: 12px; color: var(--text-light); font-size: 15px; font-family: 'Montserrat', sans-serif; }
-        .pair-selector select { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23D4A574' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; background-size: 18px; }
+        .form-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 20px 16px; backdrop-filter: blur(10px); }
+        .pair-selector { margin-bottom: 16px; }
+        .pair-selector label, .input-group label { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--sand-light); margin-bottom: 6px; }
+        .pair-selector select, .input-group input { width: 100%; padding: 12px 14px; background: rgba(0, 0, 0, 0.3); border: 1px solid var(--card-border); border-radius: 10px; color: var(--text-light); font-size: 14px; font-family: 'Montserrat', sans-serif; }
+        .pair-selector select { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23D4A574' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px; }
         .pair-selector select:focus, .input-group input:focus { outline: none; border-color: var(--sand); }
-        .input-group { margin-bottom: 16px; }
+        .input-group { margin-bottom: 14px; }
         .input-group input::placeholder { color: rgba(255, 255, 255, 0.3); }
-        .amount-display { background: linear-gradient(135deg, rgba(26, 54, 93, 0.8), rgba(35, 78, 130, 0.8)); border: 1px solid var(--gold); border-radius: 16px; padding: 16px; margin: 20px 0; text-align: center; }
-        .amount-display-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--sand-light); margin-bottom: 6px; }
-        .amount-display-value { font-size: 28px; font-weight: 700; color: var(--gold-light); }
-        .submit-btn { width: 100%; padding: 18px; background: linear-gradient(135deg, var(--sand-dark), var(--gold)); border: none; border-radius: 14px; color: var(--blue-deep); font-size: 16px; font-weight: 700; font-family: 'Montserrat', sans-serif; cursor: pointer; transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 2px; margin-top: 10px; box-shadow: 0 4px 20px rgba(212, 165, 116, 0.3); }
+        .amount-display { background: linear-gradient(135deg, rgba(26, 54, 93, 0.8), rgba(35, 78, 130, 0.8)); border: 1px solid var(--gold); border-radius: 14px; padding: 14px; margin: 16px 0; text-align: center; }
+        .amount-display-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--sand-light); margin-bottom: 4px; }
+        .amount-display-value { font-size: 24px; font-weight: 700; color: var(--gold-light); }
+        .submit-btn { width: 100%; padding: 16px; background: linear-gradient(135deg, var(--sand-dark), var(--gold)); border: none; border-radius: 12px; color: var(--blue-deep); font-size: 15px; font-weight: 700; font-family: 'Montserrat', sans-serif; cursor: pointer; transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 2px; margin-top: 8px; box-shadow: 0 4px 20px rgba(212, 165, 116, 0.3); }
         .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(212, 165, 116, 0.4); }
         .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, var(--blue-deep), rgba(26, 54, 93, 0.95)); padding: 12px 16px 20px; display: flex; justify-content: space-around; border-top: 1px solid var(--card-border); backdrop-filter: blur(20px); z-index: 100; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; opacity: 0.6; transition: all 0.3s ease; padding: 8px 16px; }
+        
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, var(--blue-deep), rgba(26, 54, 93, 0.98)); padding: 10px 16px 16px; display: flex; justify-content: space-around; border-top: 1px solid var(--card-border); backdrop-filter: blur(20px); z-index: 100; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; opacity: 0.6; transition: all 0.3s ease; padding: 6px 20px; }
         .nav-item.active { opacity: 1; }
         .nav-item.active .nav-icon { color: var(--gold); }
         .nav-item.active .nav-label { color: var(--sand); }
-        .nav-icon { font-size: 22px; }
-        .nav-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; }
+        .nav-icon { font-size: 20px; }
+        .nav-label { font-size: 9px; text-transform: uppercase; letter-spacing: 1px; }
+        
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.8); display: none; align-items: center; justify-content: center; z-index: 200; padding: 20px; }
         .modal-overlay.visible { display: flex; animation: fadeIn 0.3s ease; }
-        .modal { background: linear-gradient(165deg, var(--blue-deep), var(--blue-royal)); border: 1px solid var(--sand); border-radius: 24px; padding: 32px 24px; text-align: center; max-width: 320px; width: 100%; }
-        .modal-icon { font-size: 64px; margin-bottom: 16px; }
-        .modal-title { font-family: 'Amiri', serif; font-size: 24px; color: var(--sand); margin-bottom: 12px; }
-        .modal-text { font-size: 14px; color: var(--sand-light); opacity: 0.8; margin-bottom: 24px; line-height: 1.6; }
-        .modal-btn { padding: 14px 32px; background: linear-gradient(135deg, var(--sand-dark), var(--gold)); border: none; border-radius: 12px; color: var(--blue-deep); font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'Montserrat', sans-serif; }
+        .modal { background: linear-gradient(165deg, var(--blue-deep), var(--blue-royal)); border: 1px solid var(--sand); border-radius: 20px; padding: 28px 20px; text-align: center; max-width: 300px; width: 100%; }
+        .modal-icon { font-size: 56px; margin-bottom: 14px; }
+        .modal-title { font-family: 'Amiri', serif; font-size: 22px; color: var(--sand); margin-bottom: 10px; }
+        .modal-text { font-size: 13px; color: var(--sand-light); opacity: 0.8; margin-bottom: 20px; line-height: 1.5; }
+        .modal-btn { padding: 12px 28px; background: linear-gradient(135deg, var(--sand-dark), var(--gold)); border: none; border-radius: 10px; color: var(--blue-deep); font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'Montserrat', sans-serif; }
+        
         .about-section { display: none; }
         .about-section.visible { display: block; animation: fadeIn 0.4s ease; }
-        .about-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 24px 20px; backdrop-filter: blur(10px); margin-bottom: 16px; }
-        .about-title { font-family: 'Amiri', serif; font-size: 20px; color: var(--sand); margin-bottom: 16px; }
-        .about-item { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
-        .about-icon { font-size: 20px; }
-        .about-text { font-size: 14px; line-height: 1.5; color: var(--sand-light); }
-        .contact-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 16px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 14px; color: var(--text-light); font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.3s ease; font-family: 'Montserrat', sans-serif; margin-bottom: 10px; }
+        .about-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 20px 16px; backdrop-filter: blur(10px); margin-bottom: 14px; }
+        .about-title { font-family: 'Amiri', serif; font-size: 18px; color: var(--sand); margin-bottom: 14px; }
+        .about-item { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px; }
+        .about-icon { font-size: 18px; }
+        .about-text { font-size: 13px; line-height: 1.4; color: var(--sand-light); }
+        .about-text strong { color: var(--gold-light); }
+        .contact-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 14px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; color: var(--text-light); font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.3s ease; font-family: 'Montserrat', sans-serif; margin-bottom: 10px; text-decoration: none; }
         .contact-btn:hover { background: rgba(212, 165, 116, 0.1); border-color: var(--sand); }
     </style>
 </head>
@@ -118,95 +134,105 @@
     <div class="container">
         <header class="header">
             <div class="logo">FULUS</div>
-            <div class="logo-arabic">فلوس</div>
+            <div class="logo-arabic">فُلُوس</div>
             <div class="subtitle">Обмен валют</div>
         </header>
         <div class="decorative-line"><div class="decorative-diamond"></div></div>
 
-        <div id="citySection">
+        <!-- Main Section: City + Rates -->
+        <div id="mainSection">
             <div class="section-title">Выберите город</div>
             <div class="city-grid">
                 <div class="city-card" data-city="mecca" onclick="selectCity('mecca')">
-                    <div class="city-icon">🕋</div>
+                    <div class="city-emoji">🕋</div>
                     <div class="city-name">Мекка</div>
-                    <div class="city-currency">SAR</div>
+                    <div class="city-currency"><span>🇸🇦</span> SAR</div>
                 </div>
                 <div class="city-card" data-city="istanbul" onclick="selectCity('istanbul')">
-                    <div class="city-icon">🕌</div>
+                    <div class="city-emoji">🕌</div>
                     <div class="city-name">Стамбул</div>
-                    <div class="city-currency">TRY</div>
+                    <div class="city-currency"><span>🇹🇷</span> TRY</div>
                 </div>
                 <div class="city-card" data-city="dubai" onclick="selectCity('dubai')">
-                    <div class="city-icon">🏙️</div>
+                    <div class="city-emoji">🏙️</div>
                     <div class="city-name">Дубай</div>
-                    <div class="city-currency">AED</div>
+                    <div class="city-currency"><span>🇦🇪</span> AED</div>
                 </div>
                 <div class="city-card" data-city="moscow" onclick="selectCity('moscow')">
-                    <div class="city-icon">🏛️</div>
+                    <div class="city-emoji">🏛️</div>
                     <div class="city-name">Москва</div>
-                    <div class="city-currency">RUB</div>
+                    <div class="city-currency"><span>🇷🇺</span> RUB</div>
                 </div>
+            </div>
+            
+            <div id="ratesSection" class="rates-container">
+                <div class="section-title">Курсы обмена</div>
+                <div id="ratesContent"></div>
             </div>
         </div>
 
-        <div id="ratesSection" class="rates-container">
-            <div class="section-title">Курсы обмена</div>
-            <div id="ratesContent"></div>
-        </div>
-
+        <!-- Exchange Section -->
         <div id="exchangeSection" class="exchange-section">
-            <div class="section-title">Оформить заявку</div>
-            <div class="tabs">
-                <div class="tab active" data-type="buy" onclick="setExchangeType('buy')">Купить</div>
-                <div class="tab" data-type="sell" onclick="setExchangeType('sell')">Продать</div>
-            </div>
-            <div class="form-card">
-                <div class="pair-selector">
-                    <label>Валютная пара</label>
-                    <select id="pairSelect" onchange="updateCalculation()"></select>
+            <div class="section-title">Выберите город</div>
+            <div class="city-grid" id="exchangeCityGrid"></div>
+            
+            <div id="exchangeFormContainer" style="display: none;">
+                <div class="section-title">Оформить заявку</div>
+                <div class="tabs">
+                    <div class="tab active" data-type="buy" onclick="setExchangeType('buy')">Купить</div>
+                    <div class="tab" data-type="sell" onclick="setExchangeType('sell')">Продать</div>
                 </div>
-                <div class="input-group">
-                    <label id="amountLabel">Сумма</label>
-                    <input type="number" id="amountInput" placeholder="Введите сумму" oninput="updateCalculation()">
+                <div class="form-card">
+                    <div class="pair-selector">
+                        <label>Валютная пара</label>
+                        <select id="pairSelect" onchange="updateCalculation()"></select>
+                    </div>
+                    <div class="input-group">
+                        <label id="amountLabel">Сумма</label>
+                        <input type="number" id="amountInput" placeholder="Введите сумму" oninput="updateCalculation()" inputmode="decimal">
+                    </div>
+                    <div class="amount-display">
+                        <div class="amount-display-label">Вы получите</div>
+                        <div class="amount-display-value" id="resultAmount">0.00</div>
+                    </div>
+                    <div class="input-group">
+                        <label>Ваше имя</label>
+                        <input type="text" id="nameInput" placeholder="Введите имя">
+                    </div>
+                    <div class="input-group">
+                        <label>WhatsApp / Телефон (необязательно)</label>
+                        <input type="tel" id="contactInput" placeholder="+7 999 123 45 67">
+                    </div>
+                    <button class="submit-btn" onclick="submitOrder()">Отправить заявку</button>
                 </div>
-                <div class="amount-display">
-                    <div class="amount-display-label">Вы получите</div>
-                    <div class="amount-display-value" id="resultAmount">0.00</div>
-                </div>
-                <div class="input-group">
-                    <label>Ваше имя</label>
-                    <input type="text" id="nameInput" placeholder="Введите имя">
-                </div>
-                <div class="input-group">
-                    <label>WhatsApp / Телефон (необязательно)</label>
-                    <input type="text" id="contactInput" placeholder="+7 999 123 45 67">
-                </div>
-                <button class="submit-btn" onclick="submitOrder()">Отправить заявку</button>
             </div>
         </div>
 
+        <!-- About Section -->
         <div id="aboutSection" class="about-section">
             <div class="section-title">О нас</div>
             <div class="about-card">
                 <div class="about-title">Fulus Exchange</div>
-                <div class="about-item"><span class="about-icon">🌍</span><span class="about-text">Работаем в 4 городах: Мекка, Стамбул, Дубай, Москва</span></div>
-                <div class="about-item"><span class="about-icon">💱</span><span class="about-text">Обмен местной валюты на USDT/USD и RUB</span></div>
-                <div class="about-item"><span class="about-icon">⏰</span><span class="about-text">Работаем ежедневно с 9:00 до 22:00</span></div>
-                <div class="about-item"><span class="about-icon">🔒</span><span class="about-text">Безопасные сделки, конфиденциальность</span></div>
-                <div class="about-item"><span class="about-icon">💰</span><span class="about-text">Лучшие курсы, без скрытых комиссий</span></div>
+                <div class="about-item"><span class="about-icon">🌍</span><span class="about-text">Работаем в <strong>4 городах</strong>: Мекка, Стамбул, Дубай, Москва</span></div>
+                <div class="about-item"><span class="about-icon">⏰</span><span class="about-text">Работаем для вас <strong>24/7</strong> — без обеда и выходных!</span></div>
+                <div class="about-item"><span class="about-icon">📊</span><span class="about-text"><strong>Самый выгодный курс</strong> на покупку и продажу валюты</span></div>
+                <div class="about-item"><span class="about-icon">💰</span><span class="about-text"><strong>0% комиссии</strong> — никаких скрытых платежей</span></div>
+                <div class="about-item"><span class="about-icon">🔒</span><span class="about-text"><strong>Безопасные сделки</strong> и полная конфиденциальность</span></div>
+                <div class="about-item"><span class="about-icon">⚡</span><span class="about-text"><strong>Быстрый обмен</strong> — заявки обрабатываются за 5-10 минут</span></div>
             </div>
-            <button class="contact-btn" onclick="openTelegram()"><span>✈️</span><span>Связаться в Telegram</span></button>
-            <button class="contact-btn" onclick="openWhatsApp()"><span>📱</span><span>Написать в WhatsApp</span></button>
+            <a href="https://t.me/daud_bank" target="_blank" class="contact-btn"><span>✈️</span><span>Связаться в Telegram</span></a>
+            <a href="https://wa.me/1234567890" target="_blank" class="contact-btn"><span>📱</span><span>Написать в WhatsApp</span></a>
         </div>
     </div>
 
-    <nav class="bottom-nav">
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav" id="bottomNav">
         <div class="nav-item active" data-section="main" onclick="showSection('main')"><span class="nav-icon">🏠</span><span class="nav-label">Главная</span></div>
-        <div class="nav-item" data-section="rates" onclick="showSection('rates')"><span class="nav-icon">📊</span><span class="nav-label">Курсы</span></div>
         <div class="nav-item" data-section="exchange" onclick="showSection('exchange')"><span class="nav-icon">💱</span><span class="nav-label">Обмен</span></div>
         <div class="nav-item" data-section="about" onclick="showSection('about')"><span class="nav-icon">ℹ️</span><span class="nav-label">О нас</span></div>
     </nav>
 
+    <!-- Success Modal -->
     <div class="modal-overlay" id="successModal">
         <div class="modal">
             <div class="modal-icon">✅</div>
@@ -220,7 +246,26 @@
         const tg = window.Telegram?.WebApp;
         if (tg) { tg.ready(); tg.expand(); tg.setHeaderColor('#1A365D'); tg.setBackgroundColor('#1A365D'); }
 
-        // ========== КУРСЫ - МЕНЯЙ ЗДЕСЬ ==========
+        // City emojis
+        const CITY_EMOJIS = {
+            mecca: '🕋',
+            istanbul: '🕌',
+            dubai: '🏙️',
+            moscow: '🏛️'
+        };
+
+        // Currency icons
+        const CURRENCY_ICONS = {
+            'SAR': '🇸🇦',
+            'TRY': '🇹🇷',
+            'AED': '🇦🇪',
+            'RUB': '🇷🇺',
+            'USDT/USD': '💵',
+            'USDT': '💵',
+            'USD': '💵'
+        };
+
+        // ========== КУРСЫ ==========
         const RATES = {
             mecca: {
                 name: 'Мекка', currency: 'SAR', currencyName: 'Саудовский риал',
@@ -252,29 +297,47 @@
         };
 
         let currentCity = null;
+        let exchangeCity = null;
         let exchangeType = 'buy';
+        let currentSection = 'main';
+
+        function getIcon(currency) {
+            return CURRENCY_ICONS[currency] || '';
+        }
 
         function selectCity(city) {
             currentCity = city;
-            document.querySelectorAll('.city-card').forEach(c => c.classList.remove('active'));
-            document.querySelector(`[data-city="${city}"]`).classList.add('active');
+            document.querySelectorAll('#mainSection .city-card').forEach(c => c.classList.remove('active'));
+            document.querySelector(`#mainSection [data-city="${city}"]`)?.classList.add('active');
             updateRates();
-            updatePairSelector();
             document.getElementById('ratesSection').classList.add('visible');
-            document.getElementById('exchangeSection').classList.add('visible');
+        }
+
+        function selectExchangeCity(city) {
+            exchangeCity = city;
+            document.querySelectorAll('#exchangeCityGrid .city-card').forEach(c => c.classList.remove('active'));
+            document.querySelector(`#exchangeCityGrid [data-city="${city}"]`)?.classList.add('active');
+            document.getElementById('exchangeFormContainer').style.display = 'block';
+            updatePairSelector();
+            
+            setTimeout(() => {
+                document.getElementById('exchangeFormContainer').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
         }
 
         function updateRates() {
             if (!currentCity) return;
             const city = RATES[currentCity];
             const local = city.currency;
+            const localIcon = getIcon(local);
             let html = '';
             city.pairs.forEach(pair => {
+                const quoteIcon = getIcon(pair.quote);
                 html += `<div class="rate-card">
                     <div class="rate-pair">
-                        <span class="currency-badge">${local}</span>
+                        <span class="currency-badge"><span class="currency-icon">${localIcon}</span> ${local}</span>
                         <span class="rate-arrow">⇄</span>
-                        <span class="currency-badge">${pair.quote}</span>
+                        <span class="currency-badge"><span class="currency-icon">${quoteIcon}</span> ${pair.quote}</span>
                     </div>
                     <div class="rate-values">
                         <div class="rate-item">
@@ -294,14 +357,16 @@
         }
 
         function updatePairSelector() {
-            if (!currentCity) return;
-            const city = RATES[currentCity];
+            if (!exchangeCity) return;
+            const city = RATES[exchangeCity];
             const local = city.currency;
+            const localIcon = getIcon(local);
             let html = '';
             city.pairs.forEach((pair, i) => {
+                const quoteIcon = getIcon(pair.quote);
                 html += exchangeType === 'buy' 
-                    ? `<option value="${i}">${pair.quote} → ${local}</option>`
-                    : `<option value="${i}">${local} → ${pair.quote}</option>`;
+                    ? `<option value="${i}">${quoteIcon} ${pair.quote} → ${localIcon} ${local}</option>`
+                    : `<option value="${i}">${localIcon} ${local} → ${quoteIcon} ${pair.quote}</option>`;
             });
             document.getElementById('pairSelect').innerHTML = html;
             updateAmountLabel();
@@ -309,11 +374,14 @@
         }
 
         function updateAmountLabel() {
-            if (!currentCity) return;
-            const city = RATES[currentCity];
+            if (!exchangeCity) return;
+            const city = RATES[exchangeCity];
             const pairIndex = parseInt(document.getElementById('pairSelect').value) || 0;
             const pair = city.pairs[pairIndex];
-            document.getElementById('amountLabel').textContent = exchangeType === 'buy' ? `Сумма в ${pair.quote}` : `Сумма в ${city.currency}`;
+            const label = document.getElementById('amountLabel');
+            const icon = exchangeType === 'buy' ? getIcon(pair.quote) : getIcon(city.currency);
+            const curr = exchangeType === 'buy' ? pair.quote : city.currency;
+            label.innerHTML = `Сумма в ${icon} ${curr}`;
         }
 
         function setExchangeType(type) {
@@ -324,12 +392,12 @@
         }
 
         function updateCalculation() {
-            if (!currentCity) { document.getElementById('resultAmount').textContent = '0.00'; return; }
+            if (!exchangeCity) { document.getElementById('resultAmount').textContent = '0.00'; return; }
             const amount = parseFloat(document.getElementById('amountInput').value) || 0;
             const pairIndex = parseInt(document.getElementById('pairSelect').value) || 0;
-            const city = RATES[currentCity];
+            const city = RATES[exchangeCity];
             const pair = city.pairs[pairIndex];
-            let result, outputCurrency;
+            let result, outputCurrency, outputIcon;
             if (exchangeType === 'buy') {
                 result = amount * pair.buy_rate;
                 outputCurrency = city.currency;
@@ -337,34 +405,54 @@
                 result = amount / pair.sell_rate;
                 outputCurrency = pair.quote;
             }
-            document.getElementById('resultAmount').textContent = `${result.toFixed(2)} ${outputCurrency}`;
+            outputIcon = getIcon(outputCurrency);
+            document.getElementById('resultAmount').textContent = `${result.toFixed(2)} ${outputIcon} ${outputCurrency}`;
+        }
+
+        function populateExchangeCities() {
+            let html = '';
+            for (const [cityId, cityData] of Object.entries(RATES)) {
+                html += `<div class="city-card" data-city="${cityId}" onclick="selectExchangeCity('${cityId}')">
+                    <div class="city-emoji">${CITY_EMOJIS[cityId]}</div>
+                    <div class="city-name">${cityData.name}</div>
+                    <div class="city-currency"><span>${getIcon(cityData.currency)}</span> ${cityData.currency}</div>
+                </div>`;
+            }
+            document.getElementById('exchangeCityGrid').innerHTML = html;
         }
 
         function showSection(section) {
+            currentSection = section;
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             document.querySelector(`[data-section="${section}"]`).classList.add('active');
-            document.getElementById('citySection').style.display = 'none';
-            document.getElementById('ratesSection').classList.remove('visible');
+            
+            document.getElementById('mainSection').style.display = 'none';
             document.getElementById('exchangeSection').classList.remove('visible');
             document.getElementById('aboutSection').classList.remove('visible');
-            if (section === 'main' || section === 'rates' || section === 'exchange') {
-                document.getElementById('citySection').style.display = 'block';
-                if (currentCity) {
-                    if (section === 'main' || section === 'rates') document.getElementById('ratesSection').classList.add('visible');
-                    if (section === 'main' || section === 'exchange') document.getElementById('exchangeSection').classList.add('visible');
-                }
+            
+            if (section === 'main') {
+                document.getElementById('mainSection').style.display = 'block';
+            } else if (section === 'exchange') {
+                document.getElementById('exchangeSection').classList.add('visible');
+                populateExchangeCities();
+                exchangeCity = null;
+                document.getElementById('exchangeFormContainer').style.display = 'none';
+                document.querySelectorAll('#exchangeCityGrid .city-card').forEach(c => c.classList.remove('active'));
+            } else if (section === 'about') {
+                document.getElementById('aboutSection').classList.add('visible');
             }
-            if (section === 'about') document.getElementById('aboutSection').classList.add('visible');
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function submitOrder() {
-            if (!currentCity) { alert('Выберите город'); return; }
+            if (!exchangeCity) { alert('Выберите город'); return; }
             const name = document.getElementById('nameInput').value.trim();
             const amount = document.getElementById('amountInput').value;
             if (!name || !amount) { alert('Заполните имя и сумму'); return; }
             const contact = document.getElementById('contactInput').value.trim();
             const pairIndex = parseInt(document.getElementById('pairSelect').value) || 0;
-            const city = RATES[currentCity];
+            const city = RATES[exchangeCity];
             const pair = city.pairs[pairIndex];
             let result, inputCurrency, outputCurrency, rateDisplay;
             if (exchangeType === 'buy') {
@@ -386,9 +474,26 @@
         }
 
         function closeModal() { document.getElementById('successModal').classList.remove('visible'); }
-        function openTelegram() { window.open('https://t.me/fulus_support', '_blank'); }
-        function openWhatsApp() { window.open('https://wa.me/1234567890', '_blank'); }
-        document.addEventListener('DOMContentLoaded', () => showSection('main'));
+
+        // Handle keyboard visibility
+        const inputs = document.querySelectorAll('input');
+        inputs.forEach(input => {
+            input.addEventListener('focus', () => {
+                document.getElementById('bottomNav').style.display = 'none';
+                document.querySelector('.container').style.paddingBottom = '20px';
+            });
+            input.addEventListener('blur', () => {
+                setTimeout(() => {
+                    document.getElementById('bottomNav').style.display = 'flex';
+                    document.querySelector('.container').style.paddingBottom = '80px';
+                }, 100);
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            showSection('main');
+            populateExchangeCities();
+        });
     </script>
 </body>
 </html>

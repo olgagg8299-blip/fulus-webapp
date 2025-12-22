@@ -52,19 +52,13 @@
         .section-title { font-family: 'Amiri', serif; font-size: 20px; color: var(--sand); margin-bottom: 14px; display: flex; align-items: center; gap: 10px; }
         .section-title::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--sand-dark), transparent); }
         
-        /* City Emoji */
-        .city-emoji {
-            font-size: 40px;
-            margin-bottom: 8px;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
-        }
+        .city-emoji { font-size: 40px; margin-bottom: 8px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
         
         .city-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
         .city-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 14px 10px; text-align: center; cursor: pointer; transition: all 0.3s ease; backdrop-filter: blur(10px); position: relative; overflow: hidden; }
         .city-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--sand), var(--gold), var(--sand)); opacity: 0; transition: opacity 0.3s ease; }
         .city-card:hover, .city-card.active { background: rgba(212, 165, 116, 0.15); border-color: var(--sand); transform: translateY(-2px); }
         .city-card.active::before { opacity: 1; }
-        .city-card.active .city-photo { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201, 162, 39, 0.3); }
         .city-name { font-weight: 600; font-size: 14px; margin-bottom: 2px; }
         .city-currency { font-size: 11px; color: var(--sand-light); opacity: 0.7; display: flex; align-items: center; justify-content: center; gap: 4px; }
         
@@ -103,7 +97,7 @@
         .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
         
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, var(--blue-deep), rgba(26, 54, 93, 0.98)); padding: 10px 16px 16px; display: flex; justify-content: space-around; border-top: 1px solid var(--card-border); backdrop-filter: blur(20px); z-index: 100; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; opacity: 0.6; transition: all 0.3s ease; padding: 6px 20px; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; opacity: 0.6; transition: all 0.3s ease; padding: 6px 12px; }
         .nav-item.active { opacity: 1; }
         .nav-item.active .nav-icon { color: var(--gold); }
         .nav-item.active .nav-label { color: var(--sand); }
@@ -128,6 +122,23 @@
         .about-text strong { color: var(--gold-light); }
         .contact-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 14px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; color: var(--text-light); font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.3s ease; font-family: 'Montserrat', sans-serif; margin-bottom: 10px; text-decoration: none; }
         .contact-btn:hover { background: rgba(212, 165, 116, 0.1); border-color: var(--sand); }
+
+        /* Orders Section */
+        .orders-section { display: none; }
+        .orders-section.visible { display: block; animation: fadeIn 0.4s ease; }
+        .order-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 14px; padding: 14px 16px; margin-bottom: 10px; backdrop-filter: blur(10px); }
+        .order-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .order-id { font-weight: 600; color: var(--sand); font-size: 14px; }
+        .order-status { font-size: 11px; padding: 4px 10px; border-radius: 20px; font-weight: 500; }
+        .order-status.pending { background: rgba(255, 193, 7, 0.2); color: #FFC107; }
+        .order-status.completed { background: rgba(76, 175, 80, 0.2); color: #4CAF50; }
+        .order-status.cancelled { background: rgba(244, 67, 54, 0.2); color: #F44336; }
+        .order-details { font-size: 12px; color: var(--sand-light); }
+        .order-details div { margin-bottom: 4px; display: flex; gap: 6px; }
+        .order-amount { font-size: 14px; font-weight: 600; color: var(--gold-light); margin-top: 8px; }
+        .empty-orders { text-align: center; padding: 40px 20px; color: var(--sand-light); }
+        .empty-orders-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
+        .empty-orders-text { font-size: 14px; margin-bottom: 20px; }
     </style>
 </head>
 <body>
@@ -139,7 +150,7 @@
         </header>
         <div class="decorative-line"><div class="decorative-diamond"></div></div>
 
-        <!-- Main Section: City + Rates -->
+        <!-- Main Section -->
         <div id="mainSection">
             <div class="section-title">Выберите город</div>
             <div class="city-grid">
@@ -208,6 +219,12 @@
             </div>
         </div>
 
+        <!-- Orders Section -->
+        <div id="ordersSection" class="orders-section">
+            <div class="section-title">Мои заявки</div>
+            <div id="ordersContent"></div>
+        </div>
+
         <!-- About Section -->
         <div id="aboutSection" class="about-section">
             <div class="section-title">О нас</div>
@@ -229,6 +246,7 @@
     <nav class="bottom-nav" id="bottomNav">
         <div class="nav-item active" data-section="main" onclick="showSection('main')"><span class="nav-icon">🏠</span><span class="nav-label">Главная</span></div>
         <div class="nav-item" data-section="exchange" onclick="showSection('exchange')"><span class="nav-icon">💱</span><span class="nav-label">Обмен</span></div>
+        <div class="nav-item" data-section="orders" onclick="showSection('orders')"><span class="nav-icon">📋</span><span class="nav-label">Заявки</span></div>
         <div class="nav-item" data-section="about" onclick="showSection('about')"><span class="nav-icon">ℹ️</span><span class="nav-label">О нас</span></div>
     </nav>
 
@@ -246,64 +264,22 @@
         const tg = window.Telegram?.WebApp;
         if (tg) { tg.ready(); tg.expand(); tg.setHeaderColor('#1A365D'); tg.setBackgroundColor('#1A365D'); }
 
-        // City emojis
-        const CITY_EMOJIS = {
-            mecca: '🕋',
-            istanbul: '🕌',
-            dubai: '🏙️',
-            moscow: '🏛️'
-        };
+        const CITY_EMOJIS = { mecca: '🕋', istanbul: '🕌', dubai: '🏙️', moscow: '🏛️' };
+        const CURRENCY_ICONS = { 'SAR': '🇸🇦', 'TRY': '🇹🇷', 'AED': '🇦🇪', 'RUB': '🇷🇺', 'USDT/USD': '💵' };
 
-        // Currency icons
-        const CURRENCY_ICONS = {
-            'SAR': '🇸🇦',
-            'TRY': '🇹🇷',
-            'AED': '🇦🇪',
-            'RUB': '🇷🇺',
-            'USDT/USD': '💵',
-            'USDT': '💵',
-            'USD': '💵'
-        };
-
-        // ========== КУРСЫ ==========
         const RATES = {
-            mecca: {
-                name: 'Мекка', currency: 'SAR', currencyName: 'Саудовский риал',
-                pairs: [
-                    { quote: 'USDT/USD', buy_rate: 3.75, sell_rate: 3.77 },
-                    { quote: 'RUB', buy_rate: 0.038, sell_rate: 0.039 }
-                ]
-            },
-            istanbul: {
-                name: 'Стамбул', currency: 'TRY', currencyName: 'Турецкая лира',
-                pairs: [
-                    { quote: 'USDT/USD', buy_rate: 34.5, sell_rate: 35.0 },
-                    { quote: 'RUB', buy_rate: 0.35, sell_rate: 0.36 }
-                ]
-            },
-            dubai: {
-                name: 'Дубай', currency: 'AED', currencyName: 'Дирхам ОАЭ',
-                pairs: [
-                    { quote: 'USDT/USD', buy_rate: 3.67, sell_rate: 3.69 },
-                    { quote: 'RUB', buy_rate: 0.037, sell_rate: 0.038 }
-                ]
-            },
-            moscow: {
-                name: 'Москва', currency: 'RUB', currencyName: 'Российский рубль',
-                pairs: [
-                    { quote: 'USDT/USD', buy_rate: 100.5, sell_rate: 101.5 }
-                ]
-            }
+            mecca: { name: 'Мекка', currency: 'SAR', pairs: [{ quote: 'USDT/USD', buy_rate: 3.75, sell_rate: 3.77 }, { quote: 'RUB', buy_rate: 0.038, sell_rate: 0.039 }] },
+            istanbul: { name: 'Стамбул', currency: 'TRY', pairs: [{ quote: 'USDT/USD', buy_rate: 34.5, sell_rate: 35.0 }, { quote: 'RUB', buy_rate: 0.35, sell_rate: 0.36 }] },
+            dubai: { name: 'Дубай', currency: 'AED', pairs: [{ quote: 'USDT/USD', buy_rate: 3.67, sell_rate: 3.69 }, { quote: 'RUB', buy_rate: 0.037, sell_rate: 0.038 }] },
+            moscow: { name: 'Москва', currency: 'RUB', pairs: [{ quote: 'USDT/USD', buy_rate: 100.5, sell_rate: 101.5 }] }
         };
 
         let currentCity = null;
         let exchangeCity = null;
         let exchangeType = 'buy';
-        let currentSection = 'main';
+        let orders = JSON.parse(localStorage.getItem('fulus_orders') || '[]');
 
-        function getIcon(currency) {
-            return CURRENCY_ICONS[currency] || '';
-        }
+        function getIcon(currency) { return CURRENCY_ICONS[currency] || ''; }
 
         function selectCity(city) {
             currentCity = city;
@@ -319,37 +295,24 @@
             document.querySelector(`#exchangeCityGrid [data-city="${city}"]`)?.classList.add('active');
             document.getElementById('exchangeFormContainer').style.display = 'block';
             updatePairSelector();
-            
-            setTimeout(() => {
-                document.getElementById('exchangeFormContainer').scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }, 100);
+            setTimeout(() => { document.getElementById('exchangeFormContainer').scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);
         }
 
         function updateRates() {
             if (!currentCity) return;
             const city = RATES[currentCity];
             const local = city.currency;
-            const localIcon = getIcon(local);
             let html = '';
             city.pairs.forEach(pair => {
-                const quoteIcon = getIcon(pair.quote);
                 html += `<div class="rate-card">
                     <div class="rate-pair">
-                        <span class="currency-badge"><span class="currency-icon">${localIcon}</span> ${local}</span>
+                        <span class="currency-badge"><span class="currency-icon">${getIcon(local)}</span> ${local}</span>
                         <span class="rate-arrow">⇄</span>
-                        <span class="currency-badge"><span class="currency-icon">${quoteIcon}</span> ${pair.quote}</span>
+                        <span class="currency-badge"><span class="currency-icon">${getIcon(pair.quote)}</span> ${pair.quote}</span>
                     </div>
                     <div class="rate-values">
-                        <div class="rate-item">
-                            <div class="rate-label">Купить ${local}</div>
-                            <div class="rate-value">${pair.buy_rate}</div>
-                            <div class="rate-currency">${local} за 1 ${pair.quote}</div>
-                        </div>
-                        <div class="rate-item">
-                            <div class="rate-label">Продать ${local}</div>
-                            <div class="rate-value">${pair.sell_rate}</div>
-                            <div class="rate-currency">${local} за 1 ${pair.quote}</div>
-                        </div>
+                        <div class="rate-item"><div class="rate-label">Купить ${local}</div><div class="rate-value">${pair.buy_rate}</div><div class="rate-currency">${local} за 1 ${pair.quote}</div></div>
+                        <div class="rate-item"><div class="rate-label">Продать ${local}</div><div class="rate-value">${pair.sell_rate}</div><div class="rate-currency">${local} за 1 ${pair.quote}</div></div>
                     </div>
                 </div>`;
             });
@@ -359,14 +322,11 @@
         function updatePairSelector() {
             if (!exchangeCity) return;
             const city = RATES[exchangeCity];
-            const local = city.currency;
-            const localIcon = getIcon(local);
             let html = '';
             city.pairs.forEach((pair, i) => {
-                const quoteIcon = getIcon(pair.quote);
                 html += exchangeType === 'buy' 
-                    ? `<option value="${i}">${quoteIcon} ${pair.quote} → ${localIcon} ${local}</option>`
-                    : `<option value="${i}">${localIcon} ${local} → ${quoteIcon} ${pair.quote}</option>`;
+                    ? `<option value="${i}">${getIcon(pair.quote)} ${pair.quote} → ${getIcon(city.currency)} ${city.currency}</option>`
+                    : `<option value="${i}">${getIcon(city.currency)} ${city.currency} → ${getIcon(pair.quote)} ${pair.quote}</option>`;
             });
             document.getElementById('pairSelect').innerHTML = html;
             updateAmountLabel();
@@ -378,10 +338,8 @@
             const city = RATES[exchangeCity];
             const pairIndex = parseInt(document.getElementById('pairSelect').value) || 0;
             const pair = city.pairs[pairIndex];
-            const label = document.getElementById('amountLabel');
-            const icon = exchangeType === 'buy' ? getIcon(pair.quote) : getIcon(city.currency);
             const curr = exchangeType === 'buy' ? pair.quote : city.currency;
-            label.innerHTML = `Сумма в ${icon} ${curr}`;
+            document.getElementById('amountLabel').innerHTML = `Сумма в ${getIcon(curr)} ${curr}`;
         }
 
         function setExchangeType(type) {
@@ -397,16 +355,10 @@
             const pairIndex = parseInt(document.getElementById('pairSelect').value) || 0;
             const city = RATES[exchangeCity];
             const pair = city.pairs[pairIndex];
-            let result, outputCurrency, outputIcon;
-            if (exchangeType === 'buy') {
-                result = amount * pair.buy_rate;
-                outputCurrency = city.currency;
-            } else {
-                result = amount / pair.sell_rate;
-                outputCurrency = pair.quote;
-            }
-            outputIcon = getIcon(outputCurrency);
-            document.getElementById('resultAmount').textContent = `${result.toFixed(2)} ${outputIcon} ${outputCurrency}`;
+            let result, outputCurrency;
+            if (exchangeType === 'buy') { result = amount * pair.buy_rate; outputCurrency = city.currency; }
+            else { result = amount / pair.sell_rate; outputCurrency = pair.quote; }
+            document.getElementById('resultAmount').textContent = `${result.toFixed(2)} ${getIcon(outputCurrency)} ${outputCurrency}`;
         }
 
         function populateExchangeCities() {
@@ -421,13 +373,43 @@
             document.getElementById('exchangeCityGrid').innerHTML = html;
         }
 
+        function renderOrders() {
+            const container = document.getElementById('ordersContent');
+            if (orders.length === 0) {
+                container.innerHTML = `<div class="empty-orders">
+                    <div class="empty-orders-icon">📋</div>
+                    <div class="empty-orders-text">У вас пока нет заявок</div>
+                    <button class="submit-btn" onclick="showSection('exchange')">Создать заявку</button>
+                </div>`;
+                return;
+            }
+            let html = '';
+            orders.slice().reverse().forEach(order => {
+                const statusClass = order.status === 'pending' ? 'pending' : order.status === 'completed' ? 'completed' : 'cancelled';
+                const statusText = order.status === 'pending' ? 'В обработке' : order.status === 'completed' ? 'Завершена' : 'Отменена';
+                html += `<div class="order-card">
+                    <div class="order-header">
+                        <span class="order-id">Заявка #${order.id}</span>
+                        <span class="order-status ${statusClass}">${statusText}</span>
+                    </div>
+                    <div class="order-details">
+                        <div>📅 ${order.date}</div>
+                        <div>🏙️ ${order.city}</div>
+                        <div>💱 ${order.type}</div>
+                    </div>
+                    <div class="order-amount">${order.give} → ${order.receive}</div>
+                </div>`;
+            });
+            container.innerHTML = html;
+        }
+
         function showSection(section) {
-            currentSection = section;
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             document.querySelector(`[data-section="${section}"]`).classList.add('active');
             
             document.getElementById('mainSection').style.display = 'none';
             document.getElementById('exchangeSection').classList.remove('visible');
+            document.getElementById('ordersSection').classList.remove('visible');
             document.getElementById('aboutSection').classList.remove('visible');
             
             if (section === 'main') {
@@ -437,11 +419,12 @@
                 populateExchangeCities();
                 exchangeCity = null;
                 document.getElementById('exchangeFormContainer').style.display = 'none';
-                document.querySelectorAll('#exchangeCityGrid .city-card').forEach(c => c.classList.remove('active'));
+            } else if (section === 'orders') {
+                document.getElementById('ordersSection').classList.add('visible');
+                renderOrders();
             } else if (section === 'about') {
                 document.getElementById('aboutSection').classList.add('visible');
             }
-            
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -450,10 +433,12 @@
             const name = document.getElementById('nameInput').value.trim();
             const amount = document.getElementById('amountInput').value;
             if (!name || !amount) { alert('Заполните имя и сумму'); return; }
+            
             const contact = document.getElementById('contactInput').value.trim();
             const pairIndex = parseInt(document.getElementById('pairSelect').value) || 0;
             const city = RATES[exchangeCity];
             const pair = city.pairs[pairIndex];
+            
             let result, inputCurrency, outputCurrency, rateDisplay;
             if (exchangeType === 'buy') {
                 result = parseFloat(amount) * pair.buy_rate;
@@ -464,8 +449,35 @@
                 inputCurrency = city.currency; outputCurrency = pair.quote;
                 rateDisplay = `${pair.sell_rate} ${city.currency} = 1 ${pair.quote}`;
             }
-            const orderData = { city: city.name, type: exchangeType === 'buy' ? 'Покупка' : 'Продажа', local_currency: city.currency, pair: `${inputCurrency} → ${outputCurrency}`, rate: rateDisplay, amount: `${amount} ${inputCurrency}`, result: `${result.toFixed(2)} ${outputCurrency}`, name, contact: contact || 'Не указан' };
-            if (tg) tg.sendData(JSON.stringify(orderData));
+            
+            const orderId = Date.now().toString().slice(-6);
+            const orderData = { 
+                city: city.name, 
+                type: exchangeType === 'buy' ? 'Покупка' : 'Продажа', 
+                pair: `${inputCurrency} → ${outputCurrency}`, 
+                rate: rateDisplay, 
+                amount: `${amount} ${inputCurrency}`, 
+                result: `${result.toFixed(2)} ${outputCurrency}`, 
+                name, 
+                contact: contact || 'Не указан' 
+            };
+            
+            // Save to local storage
+            const localOrder = {
+                id: orderId,
+                date: new Date().toLocaleString('ru-RU'),
+                city: city.name,
+                type: exchangeType === 'buy' ? 'Покупка' : 'Продажа',
+                give: `${amount} ${inputCurrency}`,
+                receive: `${result.toFixed(2)} ${outputCurrency}`,
+                status: 'pending'
+            };
+            orders.push(localOrder);
+            localStorage.setItem('fulus_orders', JSON.stringify(orders));
+            
+            // Send to Telegram
+            if (tg) { tg.sendData(JSON.stringify(orderData)); }
+            
             document.getElementById('successModal').classList.add('visible');
             document.getElementById('nameInput').value = '';
             document.getElementById('contactInput').value = '';
@@ -475,9 +487,8 @@
 
         function closeModal() { document.getElementById('successModal').classList.remove('visible'); }
 
-        // Handle keyboard visibility
-        const inputs = document.querySelectorAll('input');
-        inputs.forEach(input => {
+        // Handle keyboard
+        document.querySelectorAll('input').forEach(input => {
             input.addEventListener('focus', () => {
                 document.getElementById('bottomNav').style.display = 'none';
                 document.querySelector('.container').style.paddingBottom = '20px';
@@ -490,10 +501,7 @@
             });
         });
 
-        document.addEventListener('DOMContentLoaded', () => {
-            showSection('main');
-            populateExchangeCities();
-        });
+        document.addEventListener('DOMContentLoaded', () => { showSection('main'); });
     </script>
 </body>
 </html>

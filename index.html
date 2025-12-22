@@ -475,14 +475,20 @@
             orders.push(localOrder);
             localStorage.setItem('fulus_orders', JSON.stringify(orders));
             
-            // Send to Telegram
-            if (tg) { tg.sendData(JSON.stringify(orderData)); }
-            
-            document.getElementById('successModal').classList.add('visible');
+            // Clear form
             document.getElementById('nameInput').value = '';
             document.getElementById('contactInput').value = '';
             document.getElementById('amountInput').value = '';
             updateCalculation();
+            
+            // Send to Telegram and close
+            if (tg && tg.sendData) { 
+                tg.sendData(JSON.stringify(orderData));
+                // WebApp closes automatically after sendData
+            } else {
+                // If not in Telegram, just show modal
+                document.getElementById('successModal').classList.add('visible');
+            }
         }
 
         function closeModal() { document.getElementById('successModal').classList.remove('visible'); }
